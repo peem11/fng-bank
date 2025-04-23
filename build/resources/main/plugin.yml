@@ -13,5 +13,13 @@ commands:
     permission: fng.transaction
   accepte:
     description: Accepter une transaction
-    usage: /accepte
+    usage: /accepte <joueur>
     permission: fng.accepte
+  refuse:
+    description: Refuser une transaction
+    usage: /refuse <joueur>
+    permission: fng.refuse
+  donner:
+    description: Donner des fng (devrait seulement être utilisé pour le debuggage)
+    usage: /donner <joueur> <quantité>
+    permission: fng.donner
