@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/FNG.main.iml" filepath="$PROJECT_DIR$/.idea/modules/FNG.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/org.fng.FNG.main.iml" filepath="$PROJECT_DIR$/.idea/modules/org.fng.FNG.main.iml" />
     </modules>
   </component>
 </project>

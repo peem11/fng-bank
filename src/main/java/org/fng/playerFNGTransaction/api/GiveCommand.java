@@ -47,7 +47,7 @@ public class GiveCommand implements CommandExecutor {
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                new FNGWallet(player, this.fngWalletRepository, this.plugin).addAmount(amount);
+                new FNGWallet(receiver, this.fngWalletRepository, this.plugin).addAmount(amount);
             });
         }
         return true;
