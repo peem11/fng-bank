@@ -4,13 +4,19 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.fng.playerFNGTransaction.domain.transaction.TransactionManager;
+import org.fng.playerFNGTransaction.domain.transaction.shop.FngShop;
+import org.fng.playerFNGTransaction.domain.transaction.shop.FngShopItem;
 import org.fng.playerFNGTransaction.domain.wallet.FNGWallet;
 import org.fng.playerFNGTransaction.PlayerFNGTransaction;
 import org.fng.playerFNGTransaction.infrastructure.FNGWalletRepository;
@@ -27,6 +33,22 @@ public class FNGListener implements Listener {
         this.fngWalletRepository = fngWalletRepository;
         this.plugin = plugin;
     }
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (event.getInventory().getHolder() instanceof FngShop shop){
+            event.setCancelled(true); // prevent item grab
+
+            ItemStack clickedItem = event.getCurrentItem();
+            if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+            if(clickedItem instanceof FngShopItem shopItem){
+                FNGWallet wallet = new FNGWallet(player, fngWalletRepository, plugin);
+
+            }
+        }
+    }
+
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
