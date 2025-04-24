@@ -1,6 +1,5 @@
 package org.fng.playerFNGTransaction.api;
 
-import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.fng.playerFNGTransaction.PlayerFNGTransaction;
 import org.jetbrains.annotations.NotNull;
 import java.util.List;
-import java.util.Objects;
 
 
 
@@ -25,12 +23,12 @@ public class BroadcastCommand implements CommandExecutor {
         if(args.length > 1){
             players = players.stream().filter(player -> player.hasPermission("group." + args[0])).toList();
             players.forEach(player -> {
-                player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX + args[1]);
+                player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX + " " + args[1]);
             });
             return true;
         }
         players.forEach(player -> {
-            player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX + args[0]);
+            player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX + " " + args[0]);
         });
 
         return true;

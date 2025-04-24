@@ -23,3 +23,7 @@ commands:
     description: Donner des fng (devrait seulement être utilisé pour le debuggage)
     usage: /donner <joueur> <quantité>
     permission: fng.donner
+  broadcast:
+    description: Envoyer un message a tout le monde ou seulement à un groupe
+    usage: /broadcast <groupe> <message>
+    permission: fng.broadcast

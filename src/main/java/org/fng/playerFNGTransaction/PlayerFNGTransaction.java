@@ -5,10 +5,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.fng.playerFNGTransaction.api.AcceptCommand;
-import org.fng.playerFNGTransaction.api.DeclineCommand;
-import org.fng.playerFNGTransaction.api.GiveCommand;
-import org.fng.playerFNGTransaction.api.TransactionCommand;
+import org.fng.playerFNGTransaction.api.*;
 import org.fng.playerFNGTransaction.domain.transaction.TransactionManager;
 import org.fng.playerFNGTransaction.domain.transaction.listener.FNGListener;
 import org.fng.playerFNGTransaction.domain.wallet.SeeFundsCommand;
@@ -29,12 +26,15 @@ public final class PlayerFNGTransaction extends JavaPlugin implements Listener {
     public static final String ACCEPT_COMMAND = "accepte";
     private static final String DECLINE_COMMAND = "refuse";
     private static final String GIVE_COMMAND = "donner";
+    private static final String BROADCAST_COMMAND = "broadcast";
 
     private FNGWalletRepository fngWalletRepository;
     @Override
     public void onEnable() {
         this.fngWalletRepository = new FNGWalletRepository(this);
         TransactionManager transactionManager = new TransactionManager(this);
+
+        getCommand(BROADCAST_COMMAND).setExecutor(new BroadcastCommand());
         getCommand(GIVE_COMMAND).setExecutor(new GiveCommand(this, this.fngWalletRepository));
         getCommand(DECLINE_COMMAND).setExecutor(new DeclineCommand(transactionManager, this.fngWalletRepository,this));
         getCommand(ACCEPT_COMMAND).setExecutor(new AcceptCommand(transactionManager, this.fngWalletRepository, this));
