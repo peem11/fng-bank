@@ -10,6 +10,7 @@ import org.fng.playerFNGTransaction.domain.transaction.TransactionManager;
 import org.fng.playerFNGTransaction.domain.transaction.listener.FNGListener;
 import org.fng.playerFNGTransaction.domain.wallet.SeeFundsCommand;
 import org.fng.playerFNGTransaction.infrastructure.FNGWalletRepository;
+import org.fng.playerFNGTransaction.infrastructure.ShopManagerRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -27,13 +28,22 @@ public final class PlayerFNGTransaction extends JavaPlugin implements Listener {
     private static final String DECLINE_COMMAND = "refuse";
     private static final String GIVE_COMMAND = "donner";
     private static final String BROADCAST_COMMAND = "broadcast";
-
+    private static final String SPAWN_WORKER_COMMAND = "spawnfngworker";
+    public static final String CREATE_SHOP_COMMAND = "createshop";
+    public static final String ADD_TO_SHOP_COMMAND = "addshopitem";
+    private ShopManagerRepository shopManagerRepository;
     private FNGWalletRepository fngWalletRepository;
+
     @Override
     public void onEnable() {
+        this.shopManagerRepository = new ShopManagerRepository(this);
         this.fngWalletRepository = new FNGWalletRepository(this);
         TransactionManager transactionManager = new TransactionManager(this);
 
+        getCommand(CREATE_SHOP_COMMAND).setExecutor(new CreateShopCommand(shopManagerRepository));
+        getCommand(ADD_TO_SHOP_COMMAND).setExecutor(new AddToShopCommand(shopManagerRepository));
+
+        getCommand(SPAWN_WORKER_COMMAND).setExecutor(new SpawnFngWorkerCommand());
         getCommand(BROADCAST_COMMAND).setExecutor(new BroadcastCommand());
         getCommand(GIVE_COMMAND).setExecutor(new GiveCommand(this, this.fngWalletRepository));
         getCommand(DECLINE_COMMAND).setExecutor(new DeclineCommand(transactionManager, this.fngWalletRepository,this));
@@ -41,7 +51,7 @@ public final class PlayerFNGTransaction extends JavaPlugin implements Listener {
         getCommand(TRANSACT_COMMAND).setExecutor(new TransactionCommand(this, transactionManager, this.fngWalletRepository));
         getCommand(SEE_FUNDS_COMMAND).setExecutor(new SeeFundsCommand(this, this.fngWalletRepository));
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new FNGListener(this, this.fngWalletRepository), this);
+        getServer().getPluginManager().registerEvents(new FNGListener(this, this.fngWalletRepository, this.shopManagerRepository), this);
 
     }
 
@@ -54,7 +64,14 @@ public final class PlayerFNGTransaction extends JavaPlugin implements Listener {
                 throw new RuntimeException(e);
             }
         }
+
+        if (this.shopManagerRepository != null) {
+            try {
+                this.shopManagerRepository.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
-
-
 }

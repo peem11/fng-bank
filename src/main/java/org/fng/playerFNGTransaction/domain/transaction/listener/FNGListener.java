@@ -7,9 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -20,6 +22,7 @@ import org.fng.playerFNGTransaction.domain.transaction.shop.FngShopItem;
 import org.fng.playerFNGTransaction.domain.wallet.FNGWallet;
 import org.fng.playerFNGTransaction.PlayerFNGTransaction;
 import org.fng.playerFNGTransaction.infrastructure.FNGWalletRepository;
+import org.fng.playerFNGTransaction.infrastructure.ShopManagerRepository;
 
 import java.sql.SQLException;
 
@@ -27,16 +30,40 @@ public class FNGListener implements Listener {
     private static final float DEFAULT_VALUE = 100.0f;
     private final NamespacedKey WALLET_KEY;
     private final FNGWalletRepository fngWalletRepository;
+    private final ShopManagerRepository shopManagerRepository;
     private final JavaPlugin plugin;
-    public FNGListener(JavaPlugin plugin, FNGWalletRepository fngWalletRepository) {
+    public FNGListener(JavaPlugin plugin, FNGWalletRepository fngWalletRepository, ShopManagerRepository shopManagerRepository) {
         WALLET_KEY = new NamespacedKey(plugin, "wallet");
         this.fngWalletRepository = fngWalletRepository;
         this.plugin = plugin;
+        this.shopManagerRepository = shopManagerRepository;
     }
+
+
+
+    @EventHandler
+    public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
+            if (event.getRightClicked() instanceof Villager villager) {
+                if(villager.getPersistentDataContainer().has(new NamespacedKey(plugin, "fng_worker"))){
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    Player player = event.getPlayer();
+                    try {
+                        player.openInventory(this.shopManagerRepository.getShop(new NamespacedKey(plugin, "fng_worker").value()).getInventory());
+                    }catch (SQLException e){
+                        player.sendMessage("Erreur dans la récupération du shop...");
+                    }
+                    });
+                }
+
+            }
+
+    }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         if (event.getInventory().getHolder() instanceof FngShop shop){
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             event.setCancelled(true); // prevent item grab
 
             ItemStack clickedItem = event.getCurrentItem();
@@ -44,8 +71,9 @@ public class FNGListener implements Listener {
 
             if(clickedItem instanceof FngShopItem shopItem){
                 FNGWallet wallet = new FNGWallet(player, fngWalletRepository, plugin);
-
+                player.sendMessage("Transaction effectué !");
             }
+            });
         }
     }
 

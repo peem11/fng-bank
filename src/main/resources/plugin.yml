@@ -27,3 +27,15 @@ commands:
     description: Envoyer un message a tout le monde ou seulement à un groupe
     usage: /broadcast <groupe> <message>
     permission: fng.broadcast
+  spawnfngworker:
+    description: Créer un villageois de shop FNG.
+    usgae: /spawnfngworker <nom>
+    permission: fng.spawn
+  createshop:
+    description: Crée une nouvelle boutique
+    usage: /createshop <nom>
+    permission: fng.createshop
+  addshopitem:
+    description: Ajoute un item à une boutique
+    usage: /addshopitem <shopName> <material> <amount> <displayName> <price>
+    permission: fng.addshopitem
