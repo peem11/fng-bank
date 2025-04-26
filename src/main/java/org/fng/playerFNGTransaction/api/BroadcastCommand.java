@@ -22,21 +22,23 @@ public class BroadcastCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
 
-        if(args.length == 0){
+        List<String> argsList = PlayerFNGTransaction.splitArguments(String.join(" ", args));
+
+        if(argsList.isEmpty()){
             commandSender.sendMessage("Usage: /broadcast optionel:<groupe> <message>");
             return true;
         }
 
         List<Player> players = Bukkit.getOnlinePlayers().stream().map(Player::getPlayer).toList();
-        if(args.length > 1){
-            players = players.stream().filter(player -> player.hasPermission("group." + args[0])).toList();
+        if(argsList.size() == 2){
+            players = players.stream().filter(player -> player.hasPermission("group." + argsList.getFirst())).toList();
             players.forEach(player -> {
-                player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX.append(Component.text(" " + String.join(" ", Arrays.copyOfRange(args, 1, args.length)))));
+                player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX.append(Component.text(argsList.get(1))));
             });
             return true;
         }
         players.forEach(player -> {
-            player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX.append(Component.text(" " + String.join(" ", Arrays.copyOfRange(args, 0, args.length)))));
+            player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX.append(Component.text(argsList.getFirst())));
         });
 
         return true;

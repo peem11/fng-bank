@@ -22,14 +22,16 @@ public class FNGWallet implements Wallet<Float> {
     private final FNGWalletRepository fngWalletRepository;
     private final JavaPlugin plugin;
     private final Player player;
+
     public FNGWallet(Player player, FNGWalletRepository repository, JavaPlugin plugin1) {
         this.fngWalletRepository = repository;
         this.player = player;
         this.plugin = plugin1;
     }
+
     @Override
     public Float retrieve(Float amount) {
-        if(this.getAmount() < amount){
+        if (this.getAmount() < amount) {
             throw new InsufficientFundsException();
         }
         this.removeAmount(amount);
@@ -41,7 +43,7 @@ public class FNGWallet implements Wallet<Float> {
         this.addAmount(amount);
     }
 
-    public boolean playerHasWallet(){
+    public boolean playerHasWallet() {
         try {
             return this.fngWalletRepository.hasWallet(player.getUniqueId());
         } catch (SQLException e) {
@@ -49,28 +51,29 @@ public class FNGWallet implements Wallet<Float> {
         }
     }
 
-    public void removeAmount(Float amount){
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try{
-                this.fngWalletRepository.remove(this.player.getUniqueId(), amount);
-            }catch (SQLException e){
-                if(e.getMessage().contains("CHECK constraint failed")){
-                    this.player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX.append(Component.text(" Tu n'as pas assez de FNG!", NamedTextColor.RED)));
-                }
+    public void removeAmount(Float amount) {
+        try {
+            this.fngWalletRepository.remove(this.player.getUniqueId(), amount);
+        } catch (SQLException e) {
+            if (e.getMessage().contains("CHECK constraint failed")) {
+                this.player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX.append(Component.text(" Tu n'as pas assez de FNG!", NamedTextColor.RED)));
+                throw new InsufficientFundsException();
             }
-        });
+        }
     }
-    public void addAmount(Float amount){
+
+    public void addAmount(Float amount) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try{
+            try {
                 this.fngWalletRepository.add(this.player.getUniqueId(), amount);
-            }catch (SQLException e){
+            } catch (SQLException e) {
                 this.player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX.append(Component.text(" erreur", NamedTextColor.RED)));
             }
         });
     }
-   public float getAmount() {
-        if(!this.playerHasWallet()) throw new RuntimeException("Le joueur n'a pas de portefeuil !");
+
+    public float getAmount() {
+        if (!this.playerHasWallet()) throw new RuntimeException("Le joueur n'a pas de portefeuil !");
         float amount = 0.0f;
         try {
             amount = this.fngWalletRepository.getPlayerFNG(this.player.getUniqueId());
@@ -85,7 +88,7 @@ public class FNGWallet implements Wallet<Float> {
         try {
             this.fngWalletRepository.setAmount(player.getUniqueId(), amount);
         } catch (SQLException e) {
-            if(e.getMessage().contains("CHECK constraint failed")){
+            if (e.getMessage().contains("CHECK constraint failed")) {
                 player.sendMessage(PlayerFNGTransaction.PLUGIN_PREFIX.append(Component.text(" Tu n'as pas assez de FNG!", NamedTextColor.RED)));
             }
         }
