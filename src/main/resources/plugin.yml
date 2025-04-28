@@ -39,3 +39,7 @@ commands:
     description: Ajoute un item à une boutique
     usage: /addtoshop "<shop name>" "<material>" "<amount>" "<prix>" "<nom de l'item...>"
     permission: fng.addtoshop
+  vendre:
+      description: Vendre des items pour des FNG
+      usage: /vendre
+      permission: fng.vendre

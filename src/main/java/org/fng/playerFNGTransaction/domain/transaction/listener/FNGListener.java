@@ -12,23 +12,27 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.fng.playerFNGTransaction.domain.transaction.TransactionManager;
+import org.fng.playerFNGTransaction.domain.transaction.shop.FngSellShop;
 import org.fng.playerFNGTransaction.domain.transaction.shop.FngShop;
-import org.fng.playerFNGTransaction.domain.transaction.shop.FngShopItem;
 import org.fng.playerFNGTransaction.domain.wallet.FNGWallet;
 import org.fng.playerFNGTransaction.PlayerFNGTransaction;
-import org.fng.playerFNGTransaction.domain.wallet.exceptions.InsufficientFundsException;
 import org.fng.playerFNGTransaction.infrastructure.FNGWalletRepository;
 import org.fng.playerFNGTransaction.infrastructure.ShopManagerRepository;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import static org.fng.playerFNGTransaction.domain.transaction.shop.FngSellShop.computeAmount;
 
 public class FNGListener implements Listener {
     private static final float DEFAULT_VALUE = 100.0f;
@@ -69,10 +73,76 @@ public class FNGListener implements Listener {
         }
 
     }
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (!(event.getPlayer() instanceof Player player)) return;
 
+        Inventory inv = event.getInventory();
+        if (inv.getHolder() instanceof FngSellShop shop){
+            if(shop.succeeded()) return;
+            for (int slot = 0; slot < 45; slot++) {
+                ItemStack item = inv.getItem(slot);
+                if (item == null || item.getType().isAir()) continue;
+
+                Map<Integer, ItemStack> overflow = player.getInventory().addItem(item);
+
+                overflow.values().forEach(leftOver ->
+                        player.getWorld().dropItemNaturally(player.getLocation(), leftOver));
+
+                inv.clear(slot);
+            }
+        }
+
+    }
+
+
+    private void updateConfirmLore(Inventory gui) {
+        float amount = computeAmount(gui);
+
+        ItemStack confirm = gui.getItem(45);
+        if (confirm == null || confirm.getType() != Material.GREEN_STAINED_GLASS_PANE) return;
+
+        ItemMeta meta = confirm.getItemMeta();
+        meta.lore(List.of(
+                Component.text("Clique pour valider"),
+                Component.text("Valeur du lot : §a" + amount + " FNG")
+        ));
+        confirm.setItemMeta(meta);
+        gui.setItem(45, confirm);   // pousse la mise à jour
+    }
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
+
+        if (event.getInventory().getHolder() instanceof FngSellShop shop) {
+            int slot = event.getSlot();
+            Bukkit.getScheduler().runTask(
+                    shop.getPlugin(),
+                    () -> updateConfirmLore(event.getView().getTopInventory()));
+
+            // ----- Barre du bas -----
+            if (slot >= 45 && slot <= 53) {
+                event.setCancelled(true);               // empêche de déplacer l’item
+
+                ItemStack clicked = event.getCurrentItem();
+                if (clicked == null) return;
+
+                switch (clicked.getType()) {
+                    case GREEN_STAINED_GLASS_PANE -> {
+                        if(FngSellShop.computeAmount(event.getView().getTopInventory()) <= 0) return;
+                        event.getInventory().setItem(45, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+                        shop.startTransaction(event.getView().getTopInventory());
+                        shop.setSucceeded();
+                        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                        player.closeInventory();
+                    }
+                    case RED_STAINED_GLASS_PANE -> player.closeInventory(); // annule
+                    default -> { /* tête du joueur ou autre → rien */ }
+                }
+                return;
+            }
+        }
+
         if (event.getInventory().getHolder() instanceof FngShop shop) {
             event.setCancelled(true);
             ItemStack clickedItem = event.getCurrentItem();

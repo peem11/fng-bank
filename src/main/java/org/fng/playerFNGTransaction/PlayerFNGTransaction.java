@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public final class PlayerFNGTransaction extends JavaPlugin implements Listener {
 
 
-    public static Float inflation = 1.0f;
+    private static final String SELL_COMMAND = "vendre";
     public static final TextComponent PLUGIN_PREFIX =
             Component.text("[", NamedTextColor.BLUE)
             .append(Component.text("BANQUE FNG", NamedTextColor.WHITE))
@@ -49,6 +49,8 @@ public final class PlayerFNGTransaction extends JavaPlugin implements Listener {
         this.fngWalletRepository = new FNGWalletRepository(this);
         TransactionManager transactionManager = new TransactionManager(this);
 
+
+        getCommand(SELL_COMMAND).setExecutor(new SellCommand(this, this.fngWalletRepository));
         getCommand(CREATE_SHOP_COMMAND).setExecutor(new CreateShopCommand(this,shopManagerRepository));
         getCommand(ADD_TO_SHOP_COMMAND).setExecutor(new AddToShopCommand(this,shopManagerRepository));
         getCommand(SPAWN_WORKER_COMMAND).setExecutor(new SpawnFngWorkerCommand(this));

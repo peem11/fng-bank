@@ -120,4 +120,8 @@ public class FNGWalletRepository {
         update.executeUpdate();
         update.close();
     }
+
+    public JavaPlugin getPlugin() {
+        return plugin;
+    }
 }
