@@ -4,14 +4,17 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.fng.playerFNGTransaction.domain.transaction.Receiver;
+import org.fng.playerFNGTransaction.domain.wallet.FNGWallet;
 import org.fng.playerFNGTransaction.infrastructure.ShopManagerRepository;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,6 +60,7 @@ public class FngShop implements InventoryHolder {
         nextMeta.displayName(Component.text("§ePage suivante"));
         nextPage.setItemMeta(nextMeta);
 
+
         if(page != 0){
             inventory.setItem(18, prevPage);
         }
@@ -66,6 +70,25 @@ public class FngShop implements InventoryHolder {
 
 
         return inventory;
+    }
+
+    public Inventory getInventory(FNGWallet wallet){
+       Inventory inv = this.getInventory();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, ()->{
+            float assets = wallet.getAmount();
+            ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+            SkullMeta hMeta = (SkullMeta) head.getItemMeta();
+            hMeta.lore(List.of(Component.text("Solde: "), Component.text("§a" + assets + "FNG")));
+            Player player = wallet.getPlayer();
+            Bukkit.getScheduler().runTask(plugin, () ->{
+                hMeta.setOwningPlayer(player);
+                hMeta.displayName(Component.text(player.getName()));
+                head.setItemMeta(hMeta);
+                inv.setItem(0, head);
+            });
+
+        });
+        return inv;
     }
 
     public String getName(){

@@ -60,7 +60,7 @@ public class FNGListener implements Listener {
                                         Objects.requireNonNull(villager.getPersistentDataContainer()
                                                 .get(new NamespacedKey(plugin, "fng_worker"),
                                                         PersistentDataType.STRING)))
-                                .getInventory();
+                                .getInventory(new FNGWallet(player, this.fngWalletRepository, plugin));
                         Bukkit.getScheduler().runTask(plugin, () -> {
                             player.openInventory(inventory);
                         });
