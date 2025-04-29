@@ -26,10 +26,10 @@ public class FngSellShop implements InventoryHolder {
     private static final int LOW_INTEREST_VALUE = 100;
     private static final int DEFAULT_INTEREST_VALUE = 10;
 
-    private static final Material[] MOST_WANTED_MATERIALS = {Material.OBSIDIAN, Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE, Material.NETHER_STAR};
+    private static final Material[] MOST_WANTED_MATERIALS = {Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE, Material.NETHER_STAR};
     private static final Material[] HIGH_INTEREST_MATERIALS = {Material.DIAMOND, Material.OBSIDIAN, Material.LAVA_BUCKET};
     private static final Material[] MID_INTEREST_MATERIALS = {Material.IRON_INGOT, Material.GOLD_INGOT, Material.BREAD};
-    private static final Material[] LOW_INTEREST_MATERIALS = {Material.WHEAT, Material.MELON, Material.COPPER_INGOT, Material.SUGAR_CANE};
+    private static final Material[] LOW_INTEREST_MATERIALS = {Material.WHEAT, Material.MELON, Material.COPPER_INGOT, Material.SUGAR_CANE, Material.BAMBOO};
 
     private final Player player;
     private final float assets;

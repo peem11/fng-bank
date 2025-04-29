@@ -186,7 +186,7 @@ public class FNGListener implements Listener {
                 if (clickedItem.getPersistentDataContainer().has(new NamespacedKey(plugin, "prev"))) {
                     shop.prevPage();
                     Bukkit.getScheduler().runTask(plugin, () -> {
-                        player.openInventory(shop.getInventory());
+                        player.openInventory(shop.getInventory(new FNGWallet(player, fngWalletRepository, plugin)));
                     });
                 }
             });
