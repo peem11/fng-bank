@@ -15,6 +15,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -193,9 +195,23 @@ public class FNGListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerPortal(PlayerPortalEvent event) {
+        if (event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
+            event.setCancelled(true);
+            if (event.getPlayer() != null) {
+                event.getPlayer().sendMessage(Component.text("The End is disabled!"));
+            }
+        }
+    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if (event.getPlayer().getWorld().getName().equalsIgnoreCase("world_the_end")) {
+            event.getPlayer().teleport(Bukkit.getWorld("spawn") // your spawn world
+                    .getSpawnLocation());
+            event.getPlayer().sendMessage(Component.text("You are not allowed in the End!"));
+        }
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     Player player = event.getPlayer();

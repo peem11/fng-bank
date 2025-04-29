@@ -22,14 +22,19 @@ public class FngSellShop implements InventoryHolder {
 
     private static final int MOST_WANTED = 5000;
     private static final int HIGH_INTEREST_VALUE = 650;
-    private static final int MID_INTEREST_VALUE = 200;
-    private static final int LOW_INTEREST_VALUE = 100;
+    private static final int MID_INTEREST_VALUE = 225;
+    private static final int LOW_INTEREST_VALUE = 150;
     private static final int DEFAULT_INTEREST_VALUE = 10;
 
     private static final Material[] MOST_WANTED_MATERIALS = {Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE, Material.NETHER_STAR};
     private static final Material[] HIGH_INTEREST_MATERIALS = {Material.DIAMOND, Material.OBSIDIAN, Material.LAVA_BUCKET};
+<<<<<<< Updated upstream
     private static final Material[] MID_INTEREST_MATERIALS = {Material.IRON_INGOT, Material.GOLD_INGOT, Material.BREAD};
     private static final Material[] LOW_INTEREST_MATERIALS = {Material.WHEAT, Material.MELON, Material.COPPER_INGOT, Material.SUGAR_CANE, Material.BAMBOO};
+=======
+    private static final Material[] MID_INTEREST_MATERIALS = {Material.IRON_INGOT, Material.GOLD_INGOT};
+    private static final Material[] LOW_INTEREST_MATERIALS = {Material.BREAD, Material.MELON, Material.COPPER_INGOT, Material.SUGAR_CANE};
+>>>>>>> Stashed changes
 
     private final Player player;
     private final float assets;
